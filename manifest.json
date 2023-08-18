@@ -3,9 +3,9 @@
 	"name": "Easy Bake",
 	"version": "1.0.1",
 	"minAppVersion": "0.15.0",
-	"description": "Compile linked and embedded notes into a single file",
+	"description": "Compile linked and embedded notes into a single file.",
 	"author": "mgmeyers",
-	"authorUrl": "https://github.com/mgmeyers/obsidian-easy-bake",
+	"authorUrl": "https://github.com/mgmeyers",
 	"fundingUrl": "https://www.buymeacoffee.com/mgme",
 	"isDesktopOnly": false
 }
