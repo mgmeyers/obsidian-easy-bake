@@ -8,6 +8,9 @@
 Compile your Obsidian notes into larger documents. This plugin is focused on simplicity. For more complex compilation scenarios, try <a href="https://github.com/kevboh/longform">kevboh's longform plugin</a>.
 </p>
 
+<br>
+<br>
+
 ---
 
 Activate the plugin using the `Bake current file` command in [Obsidian's command palette](https://help.obsidian.md/Plugins/Command+palette).
