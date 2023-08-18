@@ -1,6 +1,6 @@
 # Easy Bake
 
-![](screenshot.png)
+<img width="300" src="/mgmeyers/obsidian-easy-bake/raw/master/screenshot.png" alt="">
 
 Easy Bake is an Obsidian plugin that allows compiling your notes into larger documents. Links and embeds that exist on their own line will be copied into the compiled document. Inline links will be replaced with the link's text.
 
