@@ -1,8 +1,16 @@
 # Easy Bake
 
-<img width="500" src="https://github.com/mgmeyers/obsidian-easy-bake/blob/master/screenshot.png?raw=true">
+<p align="center">
+	<img width="200" src="https://github.com/mgmeyers/obsidian-easy-bake/blob/master/assets/logo.png?raw=true">
+</p>
 
 Easy Bake is an Obsidian plugin that allows compiling your notes into larger documents. This plugin is focused on simplicity. For more complex compilation scenarios, try [kevboh's longform plugin](https://github.com/kevboh/longform).
+
+Activate the plugin using the `Bake current file` command in [Obsidian's command palette](https://help.obsidian.md/Plugins/Command+palette).
+
+<p align="center">
+	<img width="500" src="https://github.com/mgmeyers/obsidian-easy-bake/blob/master/assets/screenshot.png?raw=true">
+</p>
 
 Links and embeds that exist on their own line will be copied into the compiled document. Inline links will be replaced with the link's text. This process is recursive, meaning links in linked files will also be copied into the final document.
 
