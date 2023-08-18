@@ -2,7 +2,9 @@
 
 <img width="500" src="https://github.com/mgmeyers/obsidian-easy-bake/blob/master/screenshot.png?raw=true">
 
-Easy Bake is an Obsidian plugin that allows compiling your notes into larger documents. Links and embeds that exist on their own line will be copied into the compiled document. Inline links will be replaced with the link's text. This process is recursive, meaning links in linked files will also be copied into the final document.
+Easy Bake is an Obsidian plugin that allows compiling your notes into larger documents. This plugin is focused on simplicity. For more complex compilation scenarios, try [kevboh's longform plugin](https://github.com/kevboh/longform).
+
+Links and embeds that exist on their own line will be copied into the compiled document. Inline links will be replaced with the link's text. This process is recursive, meaning links in linked files will also be copied into the final document.
 
 For example,
 
