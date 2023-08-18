@@ -1,8 +1,6 @@
 # Easy Bake
 
-<p align="center">
-	<img width="200" src="https://github.com/mgmeyers/obsidian-easy-bake/blob/master/assets/logo.png?raw=true">
-</p>
+<img align="left" width="175" src="https://github.com/mgmeyers/obsidian-easy-bake/blob/master/assets/logo.png?raw=true">
 
 Easy Bake is an Obsidian plugin that allows compiling your notes into larger documents. This plugin is focused on simplicity. For more complex compilation scenarios, try [kevboh's longform plugin](https://github.com/kevboh/longform).
 
