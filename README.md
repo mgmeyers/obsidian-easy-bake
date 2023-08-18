@@ -8,8 +8,6 @@ Activate the plugin using the `Bake current file` command in [Obsidian's command
 
 <br style="clear:both">
 
----
-
 <img width="500" src="https://github.com/mgmeyers/obsidian-easy-bake/blob/master/assets/screenshot.png?raw=true">
 
 Links and embeds that exist on their own line will be copied into the compiled document. Inline links will be replaced with the link's text. This process is recursive, meaning links in linked files will also be copied into the final document.
