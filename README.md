@@ -5,7 +5,7 @@
 <h1 align="center">Easy Bake</h1>
 
 <p align="center">
-Easy Bake is an Obsidian plugin that allows compiling your notes into larger documents. This plugin is focused on simplicity. For more complex compilation scenarios, try <a href="https://github.com/kevboh/longform">kevboh's longform plugin</a>.
+Compile your Obsidian notes into larger documents. This plugin is focused on simplicity. For more complex compilation scenarios, try <a href="https://github.com/kevboh/longform">kevboh's longform plugin</a>.
 </p>
 
 ---
