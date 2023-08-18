@@ -9,7 +9,6 @@ Compile your Obsidian notes into larger documents. This plugin is focused on sim
 </p>
 
 <br>
-<br>
 
 ---
 
