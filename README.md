@@ -6,6 +6,7 @@ Easy Bake is an Obsidian plugin that allows compiling your notes into larger doc
 
 Activate the plugin using the `Bake current file` command in [Obsidian's command palette](https://help.obsidian.md/Plugins/Command+palette).
 
+<br style="clear:both">
 <p align="center">
 	<img width="500" src="https://github.com/mgmeyers/obsidian-easy-bake/blob/master/assets/screenshot.png?raw=true">
 </p>
