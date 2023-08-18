@@ -1,4 +1,4 @@
-import { MarkdownView, Plugin } from 'obsidian';
+import { Plugin } from 'obsidian';
 import { BakeModal } from './BakeModal';
 
 export interface BakeSettings {
@@ -23,7 +23,7 @@ export default class EasyBake extends Plugin {
   }
 
   get activeMarkdownFile() {
-    return this.app.workspace.getActiveViewOfType(MarkdownView)?.file || null;
+    return this.app.workspace.activeEditor?.file;
   }
 
   async onload() {
@@ -35,7 +35,6 @@ export default class EasyBake extends Plugin {
       checkCallback: (checking) => {
         const file = this.activeMarkdownFile;
         if (checking || !file) return !!file;
-
         new BakeModal(this, file).open();
       },
     });

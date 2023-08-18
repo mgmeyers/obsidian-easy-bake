@@ -1,6 +1,13 @@
-import { App, Modal, Setting, TFile } from 'obsidian';
+import {
+  App,
+  Modal,
+  Setting,
+  TFile,
+  parseLinktext,
+  resolveSubpath,
+} from 'obsidian';
 import EasyBake, { BakeSettings } from './main';
-import { getWordCount } from './util';
+import { extractSubpath, getWordCount } from './util';
 
 const lineStartRE = /(?:^|[\r\n]) *$/;
 const lineEndRE = /^ *(?:[\r\n]|$)/;
@@ -8,6 +15,7 @@ const lineEndRE = /^ *(?:[\r\n]|$)/;
 async function bake(
   app: App,
   file: TFile,
+  subpath: string | null,
   ancestors: Set<TFile>,
   settings: BakeSettings
 ) {
@@ -18,13 +26,22 @@ async function bake(
 
   if (!cache) return text;
 
+  if (subpath) {
+    const resolvedSubpath = resolveSubpath(cache, subpath);
+    text = extractSubpath(text, resolvedSubpath, cache);
+  }
+
   const links = settings.bakeLinks ? cache.links || [] : [];
   const embeds = settings.bakeEmbeds ? cache.embeds || [] : [];
 
   if (links.length + embeds.length === 0) return text;
 
   const targets = [...links, ...embeds].filter((v) => {
-    const linkedFile = metadataCache.getFirstLinkpathDest(v.link, file.path);
+    const parsed = parseLinktext(v.link);
+    const linkedFile = metadataCache.getFirstLinkpathDest(
+      parsed.path,
+      file.path
+    );
     return linkedFile?.extension === 'md';
   });
 
@@ -35,10 +52,9 @@ async function bake(
 
   let posOffset = 0;
   for (const target of targets) {
-    const linkedFile = metadataCache.getFirstLinkpathDest(
-      target.link,
-      file.path
-    );
+    const { path, subpath } = parseLinktext(target.link);
+    const linkedFile = metadataCache.getFirstLinkpathDest(path, file.path);
+
     if (!linkedFile) continue;
 
     const start = target.position.start.offset + posOffset;
@@ -56,11 +72,11 @@ async function bake(
     };
 
     if (newAncestors.has(linkedFile) || isInline) {
-      replaceTarget(target.displayText || target.link);
+      replaceTarget(target.displayText || path);
       continue;
     }
 
-    replaceTarget(await bake(app, linkedFile, newAncestors, settings));
+    replaceTarget(await bake(app, linkedFile, subpath, newAncestors, settings));
   }
 
   return text;
@@ -125,7 +141,7 @@ export class BakeModal extends Modal {
       new Setting(contentEl).then((setting) => {
         setting.addButton((btn) =>
           btn.setButtonText('Calculate word count').onClick(async () => {
-            const baked = await bake(this.app, file, new Set(), settings);
+            const baked = await bake(this.app, file, null, new Set(), settings);
 
             setting.descEl.setText(getWordCount(baked).toString());
           })
@@ -152,7 +168,7 @@ export class BakeModal extends Modal {
           disableBtn(btn);
           if (outputName) {
             const { vault } = this.app;
-            const baked = await bake(this.app, file, new Set(), settings);
+            const baked = await bake(this.app, file, null, new Set(), settings);
             const nextPath = outputFolder + outputName + '.md';
             let existing = vault.getAbstractFileByPath(nextPath);
 
