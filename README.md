@@ -1,12 +1,13 @@
-# Easy Bake
+<p align="center">
+  <img align="center" width="175" src="https://github.com/mgmeyers/obsidian-easy-bake/blob/master/assets/logo.png?raw=true">
+</p>
 
-<img align="left" width="175" src="https://github.com/mgmeyers/obsidian-easy-bake/blob/master/assets/logo.png?raw=true">
+<h1 align="center">Easy Bake</h1>
 
 Easy Bake is an Obsidian plugin that allows compiling your notes into larger documents. This plugin is focused on simplicity. For more complex compilation scenarios, try [kevboh's longform plugin](https://github.com/kevboh/longform).
 
 Activate the plugin using the `Bake current file` command in [Obsidian's command palette](https://help.obsidian.md/Plugins/Command+palette).
 
-<br style="clear:both">
 <br>
 
 <img width="500" src="https://github.com/mgmeyers/obsidian-easy-bake/blob/master/assets/screenshot.png?raw=true">
