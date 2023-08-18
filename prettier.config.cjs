@@ -4,7 +4,7 @@ module.exports = {
   bracketSpacing: true,
   endOfLine: 'lf',
   htmlWhitespaceSensitivity: 'css',
-  jsxBracketSameLine: false,
+  bracketSameLine: false,
   jsxSingleQuote: false,
   printWidth: 80,
   proseWrap: 'preserve',
@@ -17,4 +17,5 @@ module.exports = {
   importOrder: ['^[./]'],
   importOrderSeparation: true,
   importOrderSortSpecifiers: true,
+	plugins: ["@trivago/prettier-plugin-sort-imports"]
 };

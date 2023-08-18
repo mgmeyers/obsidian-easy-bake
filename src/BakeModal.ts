@@ -1,11 +1,14 @@
 import {
   App,
+  FileSystemAdapter,
   Modal,
+  Platform,
   Setting,
   TFile,
   parseLinktext,
   resolveSubpath,
 } from 'obsidian';
+
 import EasyBake, { BakeSettings } from './main';
 import { extractSubpath, getWordCount } from './util';
 
@@ -33,17 +36,9 @@ async function bake(
 
   const links = settings.bakeLinks ? cache.links || [] : [];
   const embeds = settings.bakeEmbeds ? cache.embeds || [] : [];
+  const targets = [...links, ...embeds];
 
-  if (links.length + embeds.length === 0) return text;
-
-  const targets = [...links, ...embeds].filter((v) => {
-    const parsed = parseLinktext(v.link);
-    const linkedFile = metadataCache.getFirstLinkpathDest(
-      parsed.path,
-      file.path
-    );
-    return linkedFile?.extension === 'md';
-  });
+  if (targets.length === 0) return text;
 
   targets.sort((a, b) => a.position.start.offset - b.position.start.offset);
 
@@ -65,11 +60,24 @@ async function bake(
     const after = text.substring(end);
 
     const isInline = !lineStartRE.test(before) || !lineEndRE.test(after);
+    const notMarkdown = linkedFile.extension !== 'md';
 
     const replaceTarget = (replacement: string) => {
       text = before + replacement + after;
       posOffset += replacement.length - prevLen;
     };
+
+    if (notMarkdown) {
+      if (!settings.convertFileLinks) continue;
+
+      // FYI: CapacitorAdapter also has getFullPath so this should work on mobile and desktop
+      const fullPath = (app.vault.adapter as FileSystemAdapter).getFullPath(
+        linkedFile.path
+      );
+      const protocol = Platform.isWin ? 'file:///' : 'file://';
+      replaceTarget(`![](${protocol}${encodeURI(fullPath)})`);
+      continue;
+    }
 
     if (newAncestors.has(linkedFile) || isInline) {
       replaceTarget(target.displayText || path);
@@ -133,6 +141,18 @@ export class BakeModal extends Modal {
       .addToggle((toggle) =>
         toggle.setValue(settings.bakeLinks).onChange((value) => {
           settings.bakeLinks = value;
+          plugin.saveSettings();
+        })
+      );
+
+    new Setting(contentEl)
+      .setName('Bake file links')
+      .setDesc(
+        'Convert links to ![[non-markdown files.png]] to ![](file:///full/path/to/non-markdown%20files.png)'
+      )
+      .addToggle((toggle) =>
+        toggle.setValue(settings.convertFileLinks).onChange((value) => {
+          settings.convertFileLinks = value;
           plugin.saveSettings();
         })
       );

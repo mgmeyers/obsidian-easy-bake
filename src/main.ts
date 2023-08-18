@@ -1,14 +1,17 @@
 import { Plugin } from 'obsidian';
+
 import { BakeModal } from './BakeModal';
 
 export interface BakeSettings {
   bakeLinks: boolean;
   bakeEmbeds: boolean;
+  convertFileLinks: boolean;
 }
 
 const DEFAULT_SETTINGS: BakeSettings = {
   bakeLinks: true,
   bakeEmbeds: true,
+  convertFileLinks: true,
 };
 
 export default class EasyBake extends Plugin {
