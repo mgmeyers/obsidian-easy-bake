@@ -5,12 +5,14 @@ import { BakeModal } from './BakeModal';
 export interface BakeSettings {
   bakeLinks: boolean;
   bakeEmbeds: boolean;
+	bakeInList: boolean;
   convertFileLinks: boolean;
 }
 
 const DEFAULT_SETTINGS: BakeSettings = {
   bakeLinks: true,
   bakeEmbeds: true,
+  bakeInList: true,
   convertFileLinks: true,
 };
 

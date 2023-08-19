@@ -12,8 +12,18 @@ import {
 import EasyBake, { BakeSettings } from './main';
 import { extractSubpath, getWordCount } from './util';
 
-const lineStartRE = /(?:^|[\r\n]) *$/;
-const lineEndRE = /^ *(?:[\r\n]|$)/;
+const lineStartRE = /(?:^|\n) *$/;
+const listLineStartRE = /(?:^|\n)([ \t]*)(?:[-*+]|[0-9]+[.)]) +$/;
+const lineEndRE = /^ *(?:\r?\n|$)/;
+
+function applyIndent(text: string, indent?: string) {
+  if (!indent) return text;
+  return text.trim().replace(/(\r?\n)/g, `$1${indent}`);
+}
+
+function stripFirstBullet(text: string) {
+  return text.replace(/^[ \t]*(?:[-*+]|[0-9]+[.)]) +/, '');
+}
 
 async function bake(
   app: App,
@@ -31,7 +41,9 @@ async function bake(
 
   if (subpath) {
     const resolvedSubpath = resolveSubpath(cache, subpath);
-    text = extractSubpath(text, resolvedSubpath, cache);
+    if (resolvedSubpath) {
+      text = extractSubpath(text, resolvedSubpath, cache);
+    }
   }
 
   const links = settings.bakeLinks ? cache.links || [] : [];
@@ -59,7 +71,11 @@ async function bake(
     const before = text.substring(0, start);
     const after = text.substring(end);
 
-    const isInline = !lineStartRE.test(before) || !lineEndRE.test(after);
+    const listMatch = settings.bakeInList
+      ? before.match(listLineStartRE)
+      : null;
+    const isInline =
+      !(listMatch || lineStartRE.test(before)) || !lineEndRE.test(after);
     const notMarkdown = linkedFile.extension !== 'md';
 
     const replaceTarget = (replacement: string) => {
@@ -84,7 +100,10 @@ async function bake(
       continue;
     }
 
-    replaceTarget(await bake(app, linkedFile, subpath, newAncestors, settings));
+    const baked = await bake(app, linkedFile, subpath, newAncestors, settings);
+    replaceTarget(
+      listMatch ? applyIndent(stripFirstBullet(baked), listMatch[1]) : baked
+    );
   }
 
   return text;
@@ -116,7 +135,7 @@ export class BakeModal extends Modal {
     const { settings } = plugin;
 
     this.titleEl.setText('Bake file');
-    this.modalEl.addClass('mod-narrow');
+    this.modalEl.addClass('mod-narrow', 'easy-bake-modal');
     this.contentEl
       .createEl('p', { text: 'Input file: ' })
       .createEl('strong', { text: file.path });
@@ -146,6 +165,18 @@ export class BakeModal extends Modal {
       );
 
     new Setting(contentEl)
+      .setName('Bake links and embeds in lists')
+      .setDesc(
+        'Include the content of [[any link]] or ![[embedded markdown file]] when it takes up an entire list bullet.'
+      )
+      .addToggle((toggle) =>
+        toggle.setValue(settings.bakeInList).onChange((value) => {
+          settings.bakeInList = value;
+          plugin.saveSettings();
+        })
+      );
+
+    new Setting(contentEl)
       .setName('Bake file links')
       .setDesc(
         'Convert links to ![[non-markdown files.png]] to ![](file:///full/path/to/non-markdown%20files.png)'
@@ -168,7 +199,7 @@ export class BakeModal extends Modal {
         );
       });
 
-      contentEl.createDiv('modal-button-container', (el) => {
+      this.modalEl.createDiv('modal-button-container', (el) => {
         let outputName = file.basename + '.baked';
         let outputFolder = file.parent?.path || '';
 
