@@ -37,8 +37,10 @@ async function bake(
   let text = await vault.cachedRead(file);
   const cache = metadataCache.getFileCache(file);
 
+  // No cache? Return the file as is...
   if (!cache) return text;
 
+  // Get the target block or section if we have a subpath
   if (subpath) {
     const resolvedSubpath = resolveSubpath(cache, subpath);
     if (resolvedSubpath) {
@@ -46,10 +48,24 @@ async function bake(
     }
   }
 
+  // This helps us keep track of edits we make to the text and sync them with
+  // position data held in the metadata cache
+  let posOffset = 0;
+
+  // Strip the frontmatter from this child file
+  if (ancestors.size > 0 && cache.frontmatterPosition) {
+    const stripped = text
+      .substring(cache.frontmatterPosition.end.offset)
+      .trimStart();
+    posOffset = stripped.length - text.length;
+    text = stripped;
+  }
+
   const links = settings.bakeLinks ? cache.links || [] : [];
   const embeds = settings.bakeEmbeds ? cache.embeds || [] : [];
   const targets = [...links, ...embeds];
 
+  // No links in the current file; we can stop here...
   if (targets.length === 0) return text;
 
   targets.sort((a, b) => a.position.start.offset - b.position.start.offset);
@@ -57,7 +73,6 @@ async function bake(
   const newAncestors = new Set(ancestors);
   newAncestors.add(file);
 
-  let posOffset = 0;
   for (const target of targets) {
     const { path, subpath } = parseLinktext(target.link);
     const linkedFile = metadataCache.getFirstLinkpathDest(path, file.path);
@@ -76,30 +91,35 @@ async function bake(
       : null;
     const isInline =
       !(listMatch || lineStartRE.test(before)) || !lineEndRE.test(after);
-    const notMarkdown = linkedFile.extension !== 'md';
+    const isMarkdownFile = linkedFile.extension === 'md';
 
     const replaceTarget = (replacement: string) => {
       text = before + replacement + after;
       posOffset += replacement.length - prevLen;
     };
 
-    if (notMarkdown) {
+    if (!isMarkdownFile) {
+      // Skip link processing if we're not converting file links...
       if (!settings.convertFileLinks) continue;
 
-      // FYI: CapacitorAdapter also has getFullPath so this should work on mobile and desktop
-      const fullPath = (app.vault.adapter as FileSystemAdapter).getFullPath(
-        linkedFile.path
-      );
+      const adapter = app.vault.adapter as FileSystemAdapter;
+
+      // FYI: The mobile adapter also has getFullPath so this should work on mobile and desktop
+      //      The mobile adapter isn't exported in the public API, however
+      if (!adapter.getFullPath) continue;
+      const fullPath = adapter.getFullPath(linkedFile.path);
       const protocol = Platform.isWin ? 'file:///' : 'file://';
       replaceTarget(`![](${protocol}${encodeURI(fullPath)})`);
       continue;
     }
 
+    // Replace the link with its text if the it's inline or would create an infinite loop
     if (newAncestors.has(linkedFile) || isInline) {
       replaceTarget(target.displayText || path);
       continue;
     }
 
+    // Recurse and bake the linked file...
     const baked = await bake(app, linkedFile, subpath, newAncestors, settings);
     replaceTarget(
       listMatch ? applyIndent(stripFirstBullet(baked), listMatch[1]) : baked
