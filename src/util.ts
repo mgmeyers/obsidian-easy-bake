@@ -15,20 +15,40 @@ export function getWordCount(text: string): number {
   return (stripComments(text).match(wordCountRE) || []).length;
 }
 
-function dedent(str: string) {
-  const firstIndent = str.match(/^([ \t]*)/);
+export function dedent(text: string) {
+  const firstIndent = text.match(/^([ \t]*)/);
   if (firstIndent) {
-    return str.replace(
-      // Escape tab chars
+    return text.replace(
+      //                            Escape tab chars
       new RegExp(`^${firstIndent[0].replace(/\\/g, '\\$&')}`, 'gm'),
       ''
     );
   }
-  return str;
+  return text;
 }
 
-function stripBlockId(str: string) {
-  return str.replace(/ +\^[^ \n\r]+$/gm, '');
+export function applyIndent(text: string, indent?: string) {
+  if (!indent) return text;
+  return text.trim().replace(/(\r?\n)/g, `$1${indent}`);
+}
+
+export function stripFirstBullet(text: string) {
+	if (!text) return text;
+  return text.replace(/^[ \t]*(?:[-*+]|[0-9]+[.)]) +/, '');
+}
+
+export function stripBlockId(text: string) {
+	if (!text) return text;
+  return text.replace(/ +\^[^ \n\r]+$/gm, '');
+}
+
+export function stripFrontmatter(text: string) {
+	if (!text) return text;
+  return text.replace(/^---[\s\S]+?\r?\n---(?:\r?\n\s*|$)/, '');
+}
+
+export function sanitizeBakedContent(text: string) {
+  return stripBlockId(stripFrontmatter(text));
 }
 
 export function extractSubpath(

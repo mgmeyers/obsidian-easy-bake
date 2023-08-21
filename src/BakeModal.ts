@@ -10,20 +10,17 @@ import {
 } from 'obsidian';
 
 import EasyBake, { BakeSettings } from './main';
-import { extractSubpath, getWordCount } from './util';
+import {
+  applyIndent,
+  extractSubpath,
+  getWordCount,
+  sanitizeBakedContent,
+  stripFirstBullet,
+} from './util';
 
 const lineStartRE = /(?:^|\n) *$/;
 const listLineStartRE = /(?:^|\n)([ \t]*)(?:[-*+]|[0-9]+[.)]) +$/;
 const lineEndRE = /^ *(?:\r?\n|$)/;
-
-function applyIndent(text: string, indent?: string) {
-  if (!indent) return text;
-  return text.trim().replace(/(\r?\n)/g, `$1${indent}`);
-}
-
-function stripFirstBullet(text: string) {
-  return text.replace(/^[ \t]*(?:[-*+]|[0-9]+[.)]) +/, '');
-}
 
 async function bake(
   app: App,
@@ -41,24 +38,9 @@ async function bake(
   if (!cache) return text;
 
   // Get the target block or section if we have a subpath
-  if (subpath) {
-    const resolvedSubpath = resolveSubpath(cache, subpath);
-    if (resolvedSubpath) {
-      text = extractSubpath(text, resolvedSubpath, cache);
-    }
-  }
-
-  // This helps us keep track of edits we make to the text and sync them with
-  // position data held in the metadata cache
-  let posOffset = 0;
-
-  // Strip the frontmatter from this child file
-  if (ancestors.size > 0 && cache.frontmatterPosition) {
-    const stripped = text
-      .substring(cache.frontmatterPosition.end.offset)
-      .trimStart();
-    posOffset = stripped.length - text.length;
-    text = stripped;
+  const resolvedSubpath = subpath ? resolveSubpath(cache, subpath) : null;
+  if (resolvedSubpath) {
+    text = extractSubpath(text, resolvedSubpath, cache);
   }
 
   const links = settings.bakeLinks ? cache.links || [] : [];
@@ -73,6 +55,9 @@ async function bake(
   const newAncestors = new Set(ancestors);
   newAncestors.add(file);
 
+  // This helps us keep track of edits we make to the text and sync them with
+  // position data held in the metadata cache
+  let posOffset = 0;
   for (const target of targets) {
     const { path, subpath } = parseLinktext(target.link);
     const linkedFile = metadataCache.getFirstLinkpathDest(path, file.path);
@@ -120,7 +105,9 @@ async function bake(
     }
 
     // Recurse and bake the linked file...
-    const baked = await bake(app, linkedFile, subpath, newAncestors, settings);
+    const baked = sanitizeBakedContent(
+      await bake(app, linkedFile, subpath, newAncestors, settings)
+    );
     replaceTarget(
       listMatch ? applyIndent(stripFirstBullet(baked), listMatch[1]) : baked
     );

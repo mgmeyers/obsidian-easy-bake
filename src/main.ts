@@ -5,7 +5,7 @@ import { BakeModal } from './BakeModal';
 export interface BakeSettings {
   bakeLinks: boolean;
   bakeEmbeds: boolean;
-	bakeInList: boolean;
+  bakeInList: boolean;
   convertFileLinks: boolean;
 }
 
