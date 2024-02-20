@@ -16,8 +16,12 @@ const DEFAULT_SETTINGS: BakeSettings = {
   convertFileLinks: true,
 };
 
+import { EasyBakeApi } from "./api";
+
 export default class EasyBake extends Plugin {
   settings: BakeSettings;
+  
+  public api = new EasyBakeApi(this);
 
   async loadSettings() {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
