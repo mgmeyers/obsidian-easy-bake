@@ -1,7 +1,6 @@
-import { bake as bakeUtil } from "./bake";
-import {
-  TFile,
-} from 'obsidian';
+import { TFile } from 'obsidian';
+
+import { bake as bakeUtil } from './bake';
 import EasyBake, { BakeSettings } from './main';
 
 export class EasyBakeApi {
@@ -11,15 +10,12 @@ export class EasyBakeApi {
     this.plugin = plugin;
   }
 
-  public async bakeToString(
-    inputPath: string,
-    settings: BakeSettings
-  ) {
+  public async bakeToString(inputPath: string, settings: BakeSettings) {
     const app = this.plugin.app;
     const file = app.vault.getAbstractFileByPath(inputPath);
 
     if (!(file instanceof TFile)) {
-      console.error("Input file does not exist");
+      console.error('Input file does not exist');
       return;
     }
 
@@ -41,7 +37,7 @@ export class EasyBakeApi {
     } else {
       existing = await app.vault.create(outputPath, baked);
     }
-  } 
+  }
 
   public async bakeAndOpen(
     inputPath: string,
@@ -51,10 +47,9 @@ export class EasyBakeApi {
     await this.bakeToFile(inputPath, outputPath, settings);
 
     const app = this.plugin.app;
-    let existing = app.vault.getAbstractFileByPath(outputPath);
+    const existing = app.vault.getAbstractFileByPath(outputPath);
     if (existing instanceof TFile) {
       await app.workspace.getLeaf('tab').openFile(existing);
     }
   }
 }
-

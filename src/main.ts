@@ -1,6 +1,7 @@
 import { Plugin } from 'obsidian';
 
 import { BakeModal } from './BakeModal';
+import { EasyBakeApi } from './api';
 
 export interface BakeSettings {
   bakeLinks: boolean;
@@ -16,11 +17,9 @@ const DEFAULT_SETTINGS: BakeSettings = {
   convertFileLinks: true,
 };
 
-import { EasyBakeApi } from "./api";
-
 export default class EasyBake extends Plugin {
   settings: BakeSettings;
-  
+
   public api = new EasyBakeApi(this);
 
   async loadSettings() {

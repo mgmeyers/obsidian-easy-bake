@@ -1,15 +1,8 @@
-import {
-  Modal,
-  Setting,
-  TFile,
-} from 'obsidian';
+import { Modal, Setting, TFile } from 'obsidian';
 
+import { bake } from './bake';
 import EasyBake from './main';
-import {
-  getWordCount,
-} from './util';
-
-import { bake } from "./bake";
+import { getWordCount } from './util';
 
 function disableBtn(btn: HTMLButtonElement) {
   btn.removeClass('mod-cta');

@@ -33,17 +33,17 @@ export function applyIndent(text: string, indent?: string) {
 }
 
 export function stripFirstBullet(text: string) {
-	if (!text) return text;
+  if (!text) return text;
   return text.replace(/^[ \t]*(?:[-*+]|[0-9]+[.)]) +/, '');
 }
 
 export function stripBlockId(text: string) {
-	if (!text) return text;
+  if (!text) return text;
   return text.replace(/ +\^[^ \n\r]+$/gm, '');
 }
 
 export function stripFrontmatter(text: string) {
-	if (!text) return text;
+  if (!text) return text;
   return text.replace(/^---[\s\S]+?\r?\n---(?:\r?\n\s*|$)/, '');
 }
 
